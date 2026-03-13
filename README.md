@@ -1,5 +1,7 @@
 # Professional Blog
 
+**Live site: https://jpdieffe.github.io/blog/**
+
 A clean, professional blog website hosted on GitHub Pages featuring sections for blog posts, publications, funded proposals, and engineering consulting services.
 
 ## Features
