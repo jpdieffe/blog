@@ -401,42 +401,36 @@ footer {
     color: #666;
 }
 
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin: 2rem 0;
-}
-
-.tool-card {
+.tools-list {
     background: white;
-    padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    padding: 0 2rem;
 }
 
-.tool-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+.tool-entry {
+    padding: 1.75rem 0;
 }
 
-.tool-card h3 {
+.tool-entry h3 {
     color: #2c3e50;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     font-size: 1.15rem;
 }
 
-.tool-card p {
+.tool-entry p {
     color: #666;
-    margin-bottom: 1.5rem;
-    flex-grow: 1;
+    margin-bottom: 1.25rem;
+}
+
+.tool-divider {
+    border: none;
+    border-top: 1px solid #e9ecef;
+    margin: 0;
 }
 
 .tool-btn {
-    align-self: flex-start;
+    display: inline-block;
 }
 
 /* Responsive Design */
