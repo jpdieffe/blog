@@ -472,6 +472,165 @@
                 </div>
             </div>
 
+            <hr class="section-divider">
+
+            <!-- ===== 2ND ORDER SALLEN-KEY LPF ===== -->
+            <div class="filter-box" id="sklpf-box">
+                <h2>2nd-Order Sallen-Key Low-Pass Filter</h2>
+                <p class="subtitle">Fill in any four fields and hit Calculate to solve for the fifth.</p>
+
+                <!-- SVG Schematic -->
+                <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:100%;height:auto;margin:0 auto 1.75rem;border:1px solid #e9ecef;border-radius:6px;background:#fafafa;padding:4px;">
+
+                  <!-- Vin label and lead wire -->
+                  <text x="5" y="119" font-family="sans-serif" font-size="13" fill="#2c3e50">Vin</text>
+                  <line x1="40" y1="115" x2="75" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- R1 (horizontal resistor box) -->
+                  <rect x="75" y="103" width="80" height="24" fill="white" stroke="#2c3e50" stroke-width="1.8"/>
+                  <text x="115" y="119" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea" text-anchor="middle">R1</text>
+
+                  <!-- Wire R1 to NodeA -->
+                  <line x1="155" y1="115" x2="195" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <circle cx="195" cy="115" r="4" fill="#2c3e50"/>
+
+                  <!-- R2 (horizontal resistor box) -->
+                  <line x1="195" y1="115" x2="215" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <rect x="215" y="103" width="80" height="24" fill="white" stroke="#2c3e50" stroke-width="1.8"/>
+                  <text x="255" y="119" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea" text-anchor="middle">R2</text>
+
+                  <!-- Wire R2 to NodeB -->
+                  <line x1="295" y1="115" x2="330" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <circle cx="330" cy="115" r="4" fill="#2c3e50"/>
+
+                  <!-- Wire NodeB to V+ -->
+                  <line x1="330" y1="115" x2="365" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- Op-amp triangle -->
+                  <polygon points="365,78 365,178 439,128" fill="white" stroke="#2c3e50" stroke-width="2"/>
+                  <text x="373" y="120" font-family="sans-serif" font-size="14" fill="#2c3e50">+</text>
+                  <text x="371" y="151" font-family="sans-serif" font-size="16" fill="#2c3e50">&#x2212;</text>
+
+                  <!-- Output wire -->
+                  <line x1="439" y1="128" x2="510" y2="128" stroke="#2c3e50" stroke-width="1.8"/>
+                  <circle cx="470" cy="128" r="4" fill="#2c3e50"/>
+                  <circle cx="490" cy="128" r="4" fill="#2c3e50"/>
+                  <text x="513" y="132" font-family="sans-serif" font-size="13" fill="#2c3e50">Vout</text>
+
+                  <!-- C2: NodeB down to GND (two horizontal plates) -->
+                  <line x1="330" y1="119" x2="330" y2="138" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="316" y1="138" x2="344" y2="138" stroke="#2c3e50" stroke-width="2.2"/>
+                  <line x1="316" y1="150" x2="344" y2="150" stroke="#2c3e50" stroke-width="2.2"/>
+                  <text x="348" y="148" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea">C2</text>
+                  <line x1="330" y1="150" x2="330" y2="218" stroke="#2c3e50" stroke-width="1.8"/>
+                  <!-- GND -->
+                  <line x1="314" y1="218" x2="346" y2="218" stroke="#2c3e50" stroke-width="2"/>
+                  <line x1="319" y1="226" x2="341" y2="226" stroke="#2c3e50" stroke-width="2"/>
+                  <line x1="324" y1="234" x2="336" y2="234" stroke="#2c3e50" stroke-width="2"/>
+
+                  <!-- C1: NodeA feedback to Vout (up from NodeA, horizontal, two vertical plates, down to output) -->
+                  <line x1="195" y1="111" x2="195" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="195" y1="38" x2="230" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="230" y1="27" x2="230" y2="49" stroke="#2c3e50" stroke-width="2.2"/>
+                  <line x1="242" y1="27" x2="242" y2="49" stroke="#2c3e50" stroke-width="2.2"/>
+                  <text x="236" y="18" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea" text-anchor="middle">C1</text>
+                  <line x1="242" y1="38" x2="470" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="470" y1="38" x2="470" y2="124" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- Unity-gain feedback: Vout to V- -->
+                  <line x1="490" y1="132" x2="490" y2="252" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="490" y1="252" x2="300" y2="252" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="300" y1="252" x2="300" y2="143" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="300" y1="143" x2="365" y2="143" stroke="#2c3e50" stroke-width="1.8"/>
+
+                </svg>
+
+                <!-- R1 and R2 side by side -->
+                <div class="fields-row">
+                    <div class="filter-field">
+                        <label for="sklpf-r1">R1</label>
+                        <div class="input-unit-row">
+                            <input id="sklpf-r1" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                            <select id="sklpf-r1-unit" class="unit-select">
+                                <option value="1">&Omega;</option>
+                                <option value="1e3" selected>k&Omega;</option>
+                                <option value="1e6">M&Omega;</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sklpf-r1-err"></div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="sklpf-r2">R2</label>
+                        <div class="input-unit-row">
+                            <input id="sklpf-r2" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                            <select id="sklpf-r2-unit" class="unit-select">
+                                <option value="1">&Omega;</option>
+                                <option value="1e3" selected>k&Omega;</option>
+                                <option value="1e6">M&Omega;</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sklpf-r2-err"></div>
+                    </div>
+                </div>
+
+                <!-- C1 and C2 side by side -->
+                <div class="fields-row">
+                    <div class="filter-field">
+                        <label for="sklpf-c1">C1</label>
+                        <div class="input-unit-row">
+                            <input id="sklpf-c1" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                            <select id="sklpf-c1-unit" class="unit-select">
+                                <option value="1">F</option>
+                                <option value="1e-3">mF</option>
+                                <option value="1e-6">&micro;F</option>
+                                <option value="1e-9" selected>nF</option>
+                                <option value="1e-12">pF</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sklpf-c1-err"></div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="sklpf-c2">C2</label>
+                        <div class="input-unit-row">
+                            <input id="sklpf-c2" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                            <select id="sklpf-c2-unit" class="unit-select">
+                                <option value="1">F</option>
+                                <option value="1e-3">mF</option>
+                                <option value="1e-6">&micro;F</option>
+                                <option value="1e-9" selected>nF</option>
+                                <option value="1e-12">pF</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sklpf-c2-err"></div>
+                    </div>
+                </div>
+
+                <!-- Cutoff frequency -->
+                <div class="filter-field">
+                    <label for="sklpf-f">Cutoff Frequency</label>
+                    <div class="input-unit-row">
+                        <input id="sklpf-f" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 1.59">
+                        <select id="sklpf-f-unit" class="unit-select">
+                            <option value="1" selected>Hz</option>
+                            <option value="1e3">kHz</option>
+                            <option value="1e6">MHz</option>
+                            <option value="1e9">GHz</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="sklpf-f-err"></div>
+                </div>
+
+                <div class="calc-row">
+                    <button class="calc-btn" onclick="calculateSKLPF()">Calculate</button>
+                    <button class="reset-btn" onclick="resetSKLPF()">Reset</button>
+                </div>
+                <div class="calc-msg" id="sklpf-msg"></div>
+
+                <div class="formula-note">
+                    f<sub>c</sub> = 1 / (2&pi; &middot; &radic;(R1 &middot; R2 &middot; C1 &middot; C2))
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -621,22 +780,26 @@
             document.getElementById('sk2-msg').textContent = '';
         }
 
-        function calculateSK() {
-            clearResultSK();
-            const msg = document.getElementById('sk2-msg');
-            const TWO_PI = 2 * Math.PI;
+        function calculateSKGeneric(prefix) {
+            const msg = document.getElementById(`${prefix}-msg`);
+            ['r1','r2','c1','c2','f'].forEach(k => {
+                document.getElementById(`${prefix}-${k}`).classList.remove('result', 'error');
+                document.getElementById(`${prefix}-${k}-err`).textContent = '';
+            });
+            msg.textContent = '';
 
-            const r1Val = getVal('sk2-r1', 'sk2-r1-unit');
-            const r2Val = getVal('sk2-r2', 'sk2-r2-unit');
-            const c1Val = getVal('sk2-c1', 'sk2-c1-unit');
-            const c2Val = getVal('sk2-c2', 'sk2-c2-unit');
-            const fVal  = getVal('sk2-f',  'sk2-f-unit');
+            const TWO_PI = 2 * Math.PI;
+            const r1Val = getVal(`${prefix}-r1`, `${prefix}-r1-unit`);
+            const r2Val = getVal(`${prefix}-r2`, `${prefix}-r2-unit`);
+            const c1Val = getVal(`${prefix}-c1`, `${prefix}-c1-unit`);
+            const c2Val = getVal(`${prefix}-c2`, `${prefix}-c2-unit`);
+            const fVal  = getVal(`${prefix}-f`,  `${prefix}-f-unit`);
             const vals  = { r1: r1Val, r2: r2Val, c1: c1Val, c2: c2Val, f: fVal };
 
             for (const [key, v] of Object.entries(vals)) {
                 if (v === 'invalid') {
-                    document.getElementById(`sk2-${key}-err`).textContent = 'Enter a positive number.';
-                    document.getElementById(`sk2-${key}`).classList.add('error');
+                    document.getElementById(`${prefix}-${key}-err`).textContent = 'Enter a positive number.';
+                    document.getElementById(`${prefix}-${key}`).classList.add('error');
                     return;
                 }
             }
@@ -666,42 +829,49 @@
                 best = bestCapUnit(result);
             }
 
-            const inputEl = document.getElementById(`sk2-${empty}`);
-            const unitEl  = document.getElementById(`sk2-${empty}-unit`);
+            const inputEl = document.getElementById(`${prefix}-${empty}`);
+            const unitEl  = document.getElementById(`${prefix}-${empty}-unit`);
             inputEl.value = parseFloat(best.val.toPrecision(6));
             inputEl.classList.add('result');
             setSelectByValue(unitEl, best.unit);
         }
 
-        function resetSK() {
+        function calculateSK()     { calculateSKGeneric('sk2'); }
+        function calculateSKLPF() { calculateSKGeneric('sklpf'); }
+
+        function resetSKGeneric(prefix) {
             ['r1','r2','c1','c2','f'].forEach(k => {
-                const el = document.getElementById(`sk2-${k}`);
+                const el = document.getElementById(`${prefix}-${k}`);
                 el.value = '';
                 el.classList.remove('result', 'error');
-                document.getElementById(`sk2-${k}-err`).textContent = '';
+                document.getElementById(`${prefix}-${k}-err`).textContent = '';
             });
-            setSelectByValue(document.getElementById('sk2-r1-unit'), '1e3');
-            setSelectByValue(document.getElementById('sk2-r2-unit'), '1e3');
-            setSelectByValue(document.getElementById('sk2-c1-unit'), '1e-9');
-            setSelectByValue(document.getElementById('sk2-c2-unit'), '1e-9');
-            setSelectByValue(document.getElementById('sk2-f-unit'),  '1');
-            document.getElementById('sk2-msg').textContent = '';
+            setSelectByValue(document.getElementById(`${prefix}-r1-unit`), '1e3');
+            setSelectByValue(document.getElementById(`${prefix}-r2-unit`), '1e3');
+            setSelectByValue(document.getElementById(`${prefix}-c1-unit`), '1e-9');
+            setSelectByValue(document.getElementById(`${prefix}-c2-unit`), '1e-9');
+            setSelectByValue(document.getElementById(`${prefix}-f-unit`),  '1');
+            document.getElementById(`${prefix}-msg`).textContent = '';
         }
+
+        function resetSK()     { resetSKGeneric('sk2'); }
+        function resetSKLPF() { resetSKGeneric('sklpf'); }
 
         // Allow pressing Enter in any input to trigger calculate
         document.querySelectorAll('.filter-input').forEach(input => {
             input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    if (input.id.startsWith('sk2')) { calculateSK(); return; }
-                    const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
-                    calculate(prefix);
-                }
+                if (e.key !== 'Enter') return;
+                const id = input.id;
+                if (id.startsWith('sklpf')) { calculateSKLPF(); }
+                else if (id.startsWith('sk2')) { calculateSK(); }
+                else { calculate(id.startsWith('lpf') ? 'lpf' : 'hpf'); }
             });
             input.addEventListener('input', () => {
                 input.classList.remove('result', 'error');
-                if (input.id.startsWith('sk2')) { document.getElementById('sk2-msg').textContent = ''; return; }
-                const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
-                document.getElementById(`${prefix}-msg`).textContent = '';
+                const id = input.id;
+                if (id.startsWith('sklpf'))      { document.getElementById('sklpf-msg').textContent = ''; }
+                else if (id.startsWith('sk2'))   { document.getElementById('sk2-msg').textContent = ''; }
+                else { document.getElementById(`${id.startsWith('lpf') ? 'lpf' : 'hpf'}-msg`).textContent = ''; }
             });
         });
     </script>
