@@ -423,25 +423,6 @@ footer {
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
-.tool-icon {
-    font-size: 2.2rem;
-    margin-bottom: 0.75rem;
-}
-
-.tool-category {
-    display: inline-block;
-    background-color: #eef0fd;
-    color: #667eea;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.25rem 0.7rem;
-    border-radius: 20px;
-    margin-bottom: 0.75rem;
-    align-self: flex-start;
-}
-
 .tool-card h3 {
     color: #2c3e50;
     margin-bottom: 0.75rem;
