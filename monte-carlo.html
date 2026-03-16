@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Photon Simulation - My Professional Blog</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .sim-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .sim-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .sim-controls {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.75rem;
+        }
+
+        .sim-controls h2 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 1.25rem;
+        }
+
+        .ctrl-field {
+            margin-bottom: 1.1rem;
+        }
+
+        .ctrl-field label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+
+        .ctrl-field label span {
+            font-weight: 400;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .ctrl-row {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .ctrl-input {
+            flex: 1;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.9rem;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            color: #2c3e50;
+            background: #f8f9fa;
+            transition: border-color 0.2s;
+        }
+        .ctrl-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .ctrl-unit {
+            padding: 0.5rem 0.5rem;
+            font-size: 0.82rem;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #555;
+            min-width: 52px;
+            text-align: center;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #e9ecef;
+            margin: 1.1rem 0;
+        }
+
+        .run-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+        .run-btn:hover  { background: #5568d3; }
+        .run-btn:disabled { background: #aab4f5; cursor: not-allowed; }
+
+        .sim-status {
+            margin-top: 0.75rem;
+            font-size: 0.82rem;
+            color: #667eea;
+            min-height: 1.2em;
+            text-align: center;
+        }
+
+        .stats-box {
+            margin-top: 1.1rem;
+            padding: 0.9rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            color: #555;
+            display: none;
+        }
+        .stats-box.visible { display: block; }
+        .stats-box strong { color: #2c3e50; }
+        .stat-row { margin-bottom: 0.3rem; }
+
+        .canvas-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.25rem;
+        }
+
+        .canvas-panel h2 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 0.75rem;
+        }
+
+        #sim-canvas {
+            display: block;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            cursor: crosshair;
+        }
+
+        .canvas-legend {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #666;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-swatch {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .formula-note {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            border-radius: 0 4px 4px 0;
+            color: #555;
+            font-size: 0.82rem;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 680px) {
+            .sim-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="index.html">My Blog</a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="publications.html">Publications</a></li>
+                    <li><a href="funded-proposals.html">Funded Proposals</a></li>
+                    <li><a href="consulting.html">Engineering Consulting</a></li>
+                    <li><a href="tools-sims.html" class="active">Tools/Sims</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="sim-wrap">
+            <a href="tools-sims.html" class="back-link">← Back to Tools &amp; Sims</a>
+            <h1>Monte Carlo Photon Transport Simulation</h1>
+            <p style="color:#666;margin-bottom:1.5rem;font-size:0.95rem;">
+                Simulates photon propagation through a scattering/absorbing medium. Photons launch from the <strong>source</strong> (left), scatter via Henyey-Greenstein phase function, and are detected if they re-emerge at the surface within the detector radius. Detected paths are rendered on the plot.
+            </p>
+
+            <div class="sim-layout">
+
+                <!-- Controls -->
+                <div class="sim-controls">
+                    <h2>Parameters</h2>
+
+                    <div class="ctrl-field">
+                        <label>Photons <span>launched</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-photons" class="ctrl-input" type="number" value="500" min="1" max="5000" step="100">
+                            <span class="ctrl-unit">#</span>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="ctrl-field">
+                        <label>μ<sub>a</sub> — Absorption <span>cm⁻¹</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-mua" class="ctrl-input" type="number" value="0.5" min="0.001" step="0.1">
+                            <span class="ctrl-unit">cm⁻¹</span>
+                        </div>
+                    </div>
+
+                    <div class="ctrl-field">
+                        <label>μ<sub>s</sub> — Scattering <span>cm⁻¹</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-mus" class="ctrl-input" type="number" value="10" min="0.001" step="1">
+                            <span class="ctrl-unit">cm⁻¹</span>
+                        </div>
+                    </div>
+
+                    <div class="ctrl-field">
+                        <label>g — Anisotropy <span>−1 to 1</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-g" class="ctrl-input" type="number" value="0.9" min="-0.999" max="0.999" step="0.05">
+                            <span class="ctrl-unit"></span>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="ctrl-field">
+                        <label>Source–Detector Distance <span>cm</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-sdd" class="ctrl-input" type="number" value="1.0" min="0.1" step="0.1">
+                            <span class="ctrl-unit">cm</span>
+                        </div>
+                    </div>
+
+                    <div class="ctrl-field">
+                        <label>Detector Radius <span>cm</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-det-r" class="ctrl-input" type="number" value="0.1" min="0.01" step="0.01">
+                            <span class="ctrl-unit">cm</span>
+                        </div>
+                    </div>
+
+                    <div class="ctrl-field">
+                        <label>Max Depth Shown <span>cm</span></label>
+                        <div class="ctrl-row">
+                            <input id="p-depth" class="ctrl-input" type="number" value="3" min="0.5" step="0.5">
+                            <span class="ctrl-unit">cm</span>
+                        </div>
+                    </div>
+
+                    <button class="run-btn" id="run-btn" onclick="runSim()">&#x25B6; Run Simulation</button>
+                    <div class="sim-status" id="sim-status"></div>
+
+                    <div class="stats-box" id="stats-box">
+                        <div class="stat-row"><strong>Photons launched:</strong> <span id="stat-launched">—</span></div>
+                        <div class="stat-row"><strong>Photons detected:</strong> <span id="stat-detected">—</span></div>
+                        <div class="stat-row"><strong>Detection rate:</strong> <span id="stat-rate">—</span></div>
+                        <div class="stat-row"><strong>Mean free path:</strong> <span id="stat-mfp">—</span> cm</div>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="canvas-panel">
+                    <h2>Photon Paths (detected only)</h2>
+                    <canvas id="sim-canvas" width="1120" height="840"></canvas>
+                    <div class="canvas-legend">
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background:#667eea;"></div>
+                            <span>Detected path (shallow)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background:#e74c3c;"></div>
+                            <span>Detected path (deep)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background:#27ae60;width:10px;height:10px;border-radius:50%;"></div>
+                            <span>Source / Detector</span>
+                        </div>
+                    </div>
+                    <div class="formula-note">
+                        Step length: <em>d = −ln(ξ) / (μ<sub>a</sub> + μ<sub>s</sub>)</em> &nbsp;|&nbsp;
+                        Survival weight: <em>w ← w · μ<sub>s</sub> / (μ<sub>a</sub> + μ<sub>s</sub>)</em> &nbsp;|&nbsp;
+                        Scattering: Henyey-Greenstein phase function &nbsp;|&nbsp;
+                        Roulette threshold: 0.001
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Professional Blog. All rights reserved.</p>
+    </footer>
+
+    <script>
+    // ─── Monte Carlo core (runs in the main thread with async yielding) ──────────
+
+    function rand() { return Math.random(); }
+
+    // Henyey-Greenstein scatter: returns new (ux,uy,uz) given old direction and g
+    function henyeyGreenstein(ux, uy, uz, g) {
+        let cosTheta;
+        if (Math.abs(g) < 1e-6) {
+            cosTheta = 2.0 * rand() - 1.0;
+        } else {
+            const tmp = (1.0 - g * g) / (1.0 - g + 2.0 * g * rand());
+            cosTheta = (1.0 + g * g - tmp * tmp) / (2.0 * g);
+        }
+        const sinTheta = Math.sqrt(Math.max(0, 1.0 - cosTheta * cosTheta));
+        const phi = 2.0 * Math.PI * rand();
+        const cosPhi = Math.cos(phi);
+        const sinPhi = Math.sin(phi);
+
+        let ux2, uy2, uz2;
+        if (Math.abs(uz) > 0.99999) {
+            ux2 = sinTheta * cosPhi;
+            uy2 = sinTheta * sinPhi;
+            uz2 = (uz >= 0 ? 1 : -1) * cosTheta;
+        } else {
+            const denom = Math.sqrt(1.0 - uz * uz);
+            ux2 = (sinTheta * (ux * uz * cosPhi - uy * sinPhi)) / denom + ux * cosTheta;
+            uy2 = (sinTheta * (uy * uz * cosPhi + ux * sinPhi)) / denom + uy * cosTheta;
+            uz2 = -sinTheta * cosPhi * denom + uz * cosTheta;
+        }
+        // Normalise
+        const len = Math.sqrt(ux2*ux2 + uy2*uy2 + uz2*uz2);
+        return [ux2/len, uy2/len, uz2/len];
+    }
+
+    function simulatePhoton(mua, mus, g, sdd, detR) {
+        const mut = mua + mus;
+        const albedo = mus / mut;
+        const ROULETTE_THRESH = 0.001;
+
+        // Launch: x=0, z=0 (surface), direction straight down into medium
+        let x = 0, z = 0;
+        let ux = 0, uz = 1.0;   // 2D: direction in x-z plane
+        let weight = 1.0;
+        const path = [[x, z]];
+        let detected = false;
+        let maxZ = 0;
+
+        for (let steps = 0; steps < 100000; steps++) {
+            // Step length
+            const d = -Math.log(rand()) / mut;
+            x += ux * d;
+            z += uz * d;
+
+            // Hit surface from below
+            if (z <= 0) {
+                // Back-project to surface
+                const frac = -z / (uz * d);   // fraction of step that went above surface
+                x = x - ux * d * frac;         // corrected surface hit x
+                z = 0;
+                path.push([x, z]);
+
+                // Check detector
+                const dx = x - sdd;
+                if (Math.abs(dx) <= detR) {
+                    detected = true;
+                }
+                break;
+            }
+
+            if (z > maxZ) maxZ = z;
+            path.push([x, z]);
+
+            // Absorb (implicit via weight)
+            weight *= albedo;
+
+            // Russian roulette
+            if (weight < ROULETTE_THRESH) {
+                if (rand() > 0.1) { weight = 0; break; }
+                weight /= 0.1;
+            }
+
+            // Scatter (2D HG)
+            const angle = Math.acos(Math.min(1, Math.max(-1,
+                henyeyGreenstein2D(g)
+            )));
+            // Current angle in x-z plane
+            const currentAngle = Math.atan2(ux, uz);
+            const newAngle = currentAngle + (rand() < 0.5 ? angle : -angle);
+            ux = Math.sin(newAngle);
+            uz = Math.cos(newAngle);
+        }
+
+        return { detected, path, maxZ };
+    }
+
+    // 2D Henyey-Greenstein: returns cos(theta) of deflection angle
+    function henyeyGreenstein2D(g) {
+        if (Math.abs(g) < 1e-6) return 2.0 * rand() - 1.0;
+        const tmp = (1.0 - g * g) / (1.0 - g + 2.0 * g * rand());
+        return (1.0 + g * g - tmp * tmp) / (2.0 * g);
+    }
+
+    // ─── Rendering ───────────────────────────────────────────────────────────────
+
+    function drawScene(canvas, detectedPaths, sdd, maxDepthCm) {
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+
+        // Coordinate mapping: x in [-0.5*sdd … sdd+0.5*sdd], z in [0 … maxDepthCm]
+        const PAD = 60;
+        const plotW = W - 2 * PAD;
+        const plotH = H - 2 * PAD;
+
+        const xMin = -sdd * 0.4;
+        const xMax = sdd * 1.4;
+        const zMax = maxDepthCm;
+
+        function toCanvasX(x) { return PAD + (x - xMin) / (xMax - xMin) * plotW; }
+        function toCanvasZ(z) { return PAD + z / zMax * plotH; }
+
+        // Background
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        // Tissue gradient background
+        const tissueGrad = ctx.createLinearGradient(0, PAD, 0, H - PAD);
+        tissueGrad.addColorStop(0, 'rgba(30,60,90,0.6)');
+        tissueGrad.addColorStop(1, 'rgba(10,20,40,0.9)');
+        ctx.fillStyle = tissueGrad;
+        ctx.fillRect(PAD, PAD, plotW, plotH);
+
+        // Surface line
+        ctx.strokeStyle = '#e9ecef';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(PAD, PAD);
+        ctx.lineTo(PAD + plotW, PAD);
+        ctx.stroke();
+
+        // Grid lines (depth)
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        for (let z = 0.5; z < zMax; z += 0.5) {
+            const cy = toCanvasZ(z);
+            ctx.beginPath(); ctx.moveTo(PAD, cy); ctx.lineTo(PAD + plotW, cy); ctx.stroke();
+        }
+
+        // Draw detected paths
+        const nPaths = detectedPaths.length;
+        detectedPaths.forEach((path, idx) => {
+            if (path.length < 2) return;
+            // Find max depth of this path
+            let pMaxZ = 0;
+            path.forEach(([,z]) => { if (z > pMaxZ) pMaxZ = z; });
+            const depthFrac = Math.min(pMaxZ / zMax, 1);
+
+            // Color: shallow = blue, deep = red
+            const r = Math.round(102 + depthFrac * (231 - 102));
+            const g = Math.round(126 * (1 - depthFrac));
+            const b = Math.round(234 * (1 - depthFrac));
+            const alpha = Math.max(0.15, 0.7 / Math.sqrt(nPaths / 30 + 1));
+
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(toCanvasX(path[0][0]), toCanvasZ(path[0][1]));
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(toCanvasX(path[i][0]), toCanvasZ(path[i][1]));
+            }
+            ctx.stroke();
+        });
+
+        // Source dot
+        ctx.fillStyle = '#27ae60';
+        ctx.shadowColor = '#27ae60';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(toCanvasX(0), toCanvasZ(0), 7, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Detector dot
+        ctx.fillStyle = '#f39c12';
+        ctx.shadowColor = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(toCanvasX(sdd), toCanvasZ(0), 7, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Labels
+        ctx.fillStyle = '#e9ecef';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Source', toCanvasX(0), PAD - 14);
+        ctx.fillText('Detector', toCanvasX(sdd), PAD - 14);
+
+        // Axis labels
+        ctx.fillStyle = '#888';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        for (let z = 0; z <= zMax; z += 0.5) {
+            ctx.fillText(z.toFixed(1) + ' cm', PAD - 32, toCanvasZ(z) + 4);
+        }
+        // Y-axis label (depth)
+        ctx.save();
+        ctx.translate(14, PAD + plotH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Depth (cm)', 0, 0);
+        ctx.restore();
+
+        // SDD label
+        ctx.fillStyle = '#555';
+        ctx.textAlign = 'center';
+        ctx.fillText(`SDD = ${sdd.toFixed(2)} cm`, toCanvasX(sdd / 2), H - 14);
+    }
+
+    // ─── Main run function ────────────────────────────────────────────────────────
+
+    async function runSim() {
+        const btn = document.getElementById('run-btn');
+        const status = document.getElementById('sim-status');
+        const statsBox = document.getElementById('stats-box');
+
+        const nPhotons = Math.min(5000, Math.max(1, parseInt(document.getElementById('p-photons').value) || 500));
+        const mua = Math.max(0.001, parseFloat(document.getElementById('p-mua').value) || 0.5);
+        const mus = Math.max(0.001, parseFloat(document.getElementById('p-mus').value) || 10);
+        const g   = Math.min(0.999, Math.max(-0.999, parseFloat(document.getElementById('p-g').value) || 0.9));
+        const sdd = Math.max(0.01, parseFloat(document.getElementById('p-sdd').value) || 1.0);
+        const detR = Math.max(0.001, parseFloat(document.getElementById('p-det-r').value) || 0.1);
+        const maxDepth = Math.max(0.5, parseFloat(document.getElementById('p-depth').value) || 3.0);
+
+        btn.disabled = true;
+        status.textContent = 'Running simulation…';
+        statsBox.classList.remove('visible');
+
+        const CHUNK = 50;
+        const detectedPaths = [];
+        let launched = 0;
+
+        while (launched < nPhotons) {
+            const chunkSize = Math.min(CHUNK, nPhotons - launched);
+            for (let i = 0; i < chunkSize; i++) {
+                const result = simulatePhoton(mua, mus, g, sdd, detR);
+                if (result.detected) detectedPaths.push(result.path);
+                launched++;
+            }
+            // Yield to browser to keep UI responsive
+            status.textContent = `Running… ${launched} / ${nPhotons} photons`;
+            await new Promise(r => setTimeout(r, 0));
+        }
+
+        const canvas = document.getElementById('sim-canvas');
+        drawScene(canvas, detectedPaths, sdd, maxDepth);
+
+        const mfp = 1.0 / (mua + mus);
+        const rate = detectedPaths.length / nPhotons;
+
+        document.getElementById('stat-launched').textContent = nPhotons.toLocaleString();
+        document.getElementById('stat-detected').textContent = detectedPaths.length.toLocaleString();
+        document.getElementById('stat-rate').textContent = (rate * 100).toFixed(2) + '%';
+        document.getElementById('stat-mfp').textContent = mfp.toFixed(4);
+        statsBox.classList.add('visible');
+
+        status.textContent = `Done — ${detectedPaths.length} photons detected (${(rate*100).toFixed(2)}%)`;
+        btn.disabled = false;
+    }
+
+    // Initial blank canvas
+    (function() {
+        const canvas = document.getElementById('sim-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Set parameters and click Run Simulation', canvas.width/2, canvas.height/2);
+    })();
+    </script>
+</body>
+</html>
