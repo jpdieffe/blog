@@ -513,8 +513,8 @@
 
         // ── Average path (Option A): mean x per depth-slice bin ──────────────
         if (nPaths > 0) {
-            const N_BINS = 200;
-            const xSum  = new Float64Array(N_BINS);
+            const N_BINS = 40;
+            const xSum   = new Float64Array(N_BINS);
             const xCount = new Int32Array(N_BINS);
 
             detectedPaths.forEach(path => {
@@ -528,37 +528,36 @@
                 });
             });
 
-            // Collect bins that have data, smooth with a simple 5-bin moving average
-            const pts = [];
+            // Only keep bins with sufficient samples (at least 1% of detected photons)
+            const minCount = Math.max(3, nPaths * 0.01);
+            const rawPts = [];
             for (let b = 0; b < N_BINS; b++) {
-                if (xCount[b] > 0) {
-                    pts.push([xSum[b] / xCount[b], (b + 0.5) / N_BINS * zMax]);
+                if (xCount[b] >= minCount) {
+                    rawPts.push([xSum[b] / xCount[b], (b + 0.5) / N_BINS * zMax]);
                 }
             }
 
-            // 5-point moving average over x to smooth
-            const smoothed = pts.map(([,z], i) => {
+            // 11-point moving average for smooth banana curve
+            const smoothed = rawPts.map(([, z], i) => {
                 let sumX = 0, cnt = 0;
-                for (let j = Math.max(0, i-2); j <= Math.min(pts.length-1, i+2); j++) {
-                    sumX += pts[j][0]; cnt++;
+                for (let j = Math.max(0, i - 5); j <= Math.min(rawPts.length - 1, i + 5); j++) {
+                    sumX += rawPts[j][0]; cnt++;
                 }
                 return [sumX / cnt, z];
             });
 
             if (smoothed.length > 1) {
                 ctx.save();
-                ctx.setLineDash([10, 6]);
+                ctx.setLineDash([12, 7]);
                 ctx.lineWidth = 3;
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
                 ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
                 ctx.beginPath();
-                // Start at source (0,0)
-                ctx.moveTo(toCanvasX(0), toCanvasZ(0));
-                smoothed.forEach(([ax, az]) => {
-                    ctx.lineTo(toCanvasX(ax), toCanvasZ(az));
-                });
-                // End at detector (sdd, 0)
-                ctx.lineTo(toCanvasX(sdd), toCanvasZ(0));
+                ctx.moveTo(toCanvasX(smoothed[0][0]), toCanvasZ(smoothed[0][1]));
+                for (let i = 1; i < smoothed.length; i++) {
+                    ctx.lineTo(toCanvasX(smoothed[i][0]), toCanvasZ(smoothed[i][1]));
+                }
                 ctx.stroke();
                 ctx.restore();
             }
