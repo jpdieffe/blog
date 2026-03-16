@@ -31,22 +31,20 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 1.25rem 1.75rem 1.25rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
             gap: 0.75rem 1.25rem;
+            align-items: end;
         }
 
         .sim-controls h2 {
-            flex: 0 0 100%;
+            grid-column: 1 / -1;
             font-size: 1.1rem;
             color: #2c3e50;
             margin-bottom: 0;
         }
 
         .ctrl-field {
-            flex: 1 1 130px;
-            min-width: 110px;
             margin-bottom: 0;
         }
 
@@ -103,9 +101,6 @@
         }
 
         .run-btn {
-            flex: 0 0 auto;
-            width: auto;
-            min-width: 160px;
             padding: 0.6rem 1.5rem;
             background: #667eea;
             color: white;
@@ -115,23 +110,21 @@
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 0;
-            align-self: flex-end;
+            align-self: end;
         }
         .run-btn:hover  { background: #5568d3; }
         .run-btn:disabled { background: #aab4f5; cursor: not-allowed; }
 
         .sim-status {
-            flex: 1 1 180px;
+            grid-column: 1 / -1;
             font-size: 0.82rem;
             color: #667eea;
             min-height: 1.2em;
-            align-self: flex-end;
             padding-bottom: 0.15rem;
         }
 
         .stats-box {
-            flex: 0 0 100%;
+            grid-column: 1 / -1;
             padding: 0.7rem 0.9rem;
             background: #f8f9fa;
             border-radius: 6px;
@@ -199,8 +192,8 @@
         }
 
         @media (max-width: 600px) {
-            .ctrl-field { flex: 0 0 100%; }
-            .run-btn { width: 100%; }
+            .sim-controls { grid-template-columns: 1fr 1fr; }
+            .run-btn { grid-column: 1 / -1; }
         }
     </style>
 </head>
