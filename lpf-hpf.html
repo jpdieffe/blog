@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RC Filter Calculator - My Professional Blog</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tool-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .filter-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-box h2 {
+            color: #2c3e50;
+            font-size: 1.35rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .filter-box .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .filter-field {
+            margin-bottom: 1.25rem;
+        }
+
+        .filter-field label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .input-unit-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-input {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            font-size: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            color: #2c3e50;
+            background: #f8f9fa;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+        .filter-input.result {
+            background: #eef0fd;
+            border-color: #667eea;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .filter-input.error {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .unit-select {
+            padding: 0.7rem 0.6rem;
+            font-size: 0.95rem;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            background: #f8f9fa;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            min-width: 80px;
+        }
+        .unit-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.82rem;
+            margin-top: 0.3rem;
+            min-height: 1.1em;
+        }
+
+        .calc-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.75rem;
+        }
+
+        .calc-btn {
+            padding: 0.75rem 2rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .calc-btn:hover { background: #5568d3; }
+
+        .reset-btn {
+            padding: 0.75rem 1.2rem;
+            background: transparent;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+
+        .calc-msg {
+            font-size: 0.88rem;
+            color: #e74c3c;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
+
+        .formula-note {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            border-radius: 0 4px 4px 0;
+            color: #555;
+            font-size: 0.88rem;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 2px solid #e9ecef;
+            margin: 2.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="index.html">My Blog</a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="publications.html">Publications</a></li>
+                    <li><a href="funded-proposals.html">Funded Proposals</a></li>
+                    <li><a href="consulting.html">Engineering Consulting</a></li>
+                    <li><a href="tools-sims.html" class="active">Tools/Sims</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="tool-wrap">
+            <a href="tools-sims.html" class="back-link">← Back to Tools &amp; Sims</a>
+            <h1>RC Filter Calculator</h1>
+
+            <!-- ===== LOW PASS ===== -->
+            <div class="filter-box" id="lpf-box">
+                <h2>RC Low-Pass Filter</h2>
+                <p class="subtitle">Fill in any two fields and hit Calculate to solve for the third.</p>
+
+                <div class="filter-field">
+                    <label for="lpf-r">Resistance</label>
+                    <div class="input-unit-row">
+                        <input id="lpf-r" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                        <select id="lpf-r-unit" class="unit-select">
+                            <option value="1">Ω</option>
+                            <option value="1e3" selected>kΩ</option>
+                            <option value="1e6">MΩ</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="lpf-r-err"></div>
+                </div>
+
+                <div class="filter-field">
+                    <label for="lpf-c">Capacitance</label>
+                    <div class="input-unit-row">
+                        <input id="lpf-c" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                        <select id="lpf-c-unit" class="unit-select">
+                            <option value="1">F</option>
+                            <option value="1e-3">mF</option>
+                            <option value="1e-6">µF</option>
+                            <option value="1e-9" selected>nF</option>
+                            <option value="1e-12">pF</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="lpf-c-err"></div>
+                </div>
+
+                <div class="filter-field">
+                    <label for="lpf-f">Cutoff Frequency</label>
+                    <div class="input-unit-row">
+                        <input id="lpf-f" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 1.59">
+                        <select id="lpf-f-unit" class="unit-select">
+                            <option value="1" selected>Hz</option>
+                            <option value="1e3">kHz</option>
+                            <option value="1e6">MHz</option>
+                            <option value="1e9">GHz</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="lpf-f-err"></div>
+                </div>
+
+                <div class="calc-row">
+                    <button class="calc-btn" onclick="calculate('lpf')">Calculate</button>
+                    <button class="reset-btn" onclick="resetSection('lpf')">Reset</button>
+                </div>
+                <div class="calc-msg" id="lpf-msg"></div>
+
+                <div class="formula-note">
+                    f<sub>c</sub> = 1 / (2π · R · C)
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- ===== HIGH PASS ===== -->
+            <div class="filter-box" id="hpf-box">
+                <h2>RC High-Pass Filter</h2>
+                <p class="subtitle">Fill in any two fields and hit Calculate to solve for the third.</p>
+
+                <div class="filter-field">
+                    <label for="hpf-r">Resistance</label>
+                    <div class="input-unit-row">
+                        <input id="hpf-r" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                        <select id="hpf-r-unit" class="unit-select">
+                            <option value="1">Ω</option>
+                            <option value="1e3" selected>kΩ</option>
+                            <option value="1e6">MΩ</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="hpf-r-err"></div>
+                </div>
+
+                <div class="filter-field">
+                    <label for="hpf-c">Capacitance</label>
+                    <div class="input-unit-row">
+                        <input id="hpf-c" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                        <select id="hpf-c-unit" class="unit-select">
+                            <option value="1">F</option>
+                            <option value="1e-3">mF</option>
+                            <option value="1e-6">µF</option>
+                            <option value="1e-9" selected>nF</option>
+                            <option value="1e-12">pF</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="hpf-c-err"></div>
+                </div>
+
+                <div class="filter-field">
+                    <label for="hpf-f">Cutoff Frequency</label>
+                    <div class="input-unit-row">
+                        <input id="hpf-f" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 1.59">
+                        <select id="hpf-f-unit" class="unit-select">
+                            <option value="1" selected>Hz</option>
+                            <option value="1e3">kHz</option>
+                            <option value="1e6">MHz</option>
+                            <option value="1e9">GHz</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="hpf-f-err"></div>
+                </div>
+
+                <div class="calc-row">
+                    <button class="calc-btn" onclick="calculate('hpf')">Calculate</button>
+                    <button class="reset-btn" onclick="resetSection('hpf')">Reset</button>
+                </div>
+                <div class="calc-msg" id="hpf-msg"></div>
+
+                <div class="formula-note">
+                    f<sub>c</sub> = 1 / (2π · R · C)
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Professional Blog. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Returns the base-unit (SI) value of a field, or null if empty/invalid
+        function getVal(id, unitId) {
+            const input = document.getElementById(id);
+            const unit  = parseFloat(document.getElementById(unitId).value);
+            const v = parseFloat(input.value);
+            if (input.value.trim() === '') return null;
+            if (isNaN(v) || v <= 0) return 'invalid';
+            return v * unit;
+        }
+
+        // Smart unit selection for resistance result
+        function bestResUnit(ohms) {
+            if (ohms >= 1e6) return { val: ohms / 1e6, unit: '1e6', label: 'MΩ' };
+            if (ohms >= 1e3) return { val: ohms / 1e3, unit: '1e3', label: 'kΩ' };
+            return { val: ohms, unit: '1', label: 'Ω' };
+        }
+
+        // Smart unit selection for capacitance result
+        function bestCapUnit(farads) {
+            if (farads >= 1)     return { val: farads,        unit: '1',    label: 'F'  };
+            if (farads >= 1e-3)  return { val: farads / 1e-3, unit: '1e-3', label: 'mF' };
+            if (farads >= 1e-6)  return { val: farads / 1e-6, unit: '1e-6', label: 'µF' };
+            if (farads >= 1e-9)  return { val: farads / 1e-9, unit: '1e-9', label: 'nF' };
+            return                      { val: farads / 1e-12,unit: '1e-12',label: 'pF' };
+        }
+
+        // Smart unit selection for frequency result
+        function bestFreqUnit(hz) {
+            if (hz >= 1e9) return { val: hz / 1e9, unit: '1e9', label: 'GHz' };
+            if (hz >= 1e6) return { val: hz / 1e6, unit: '1e6', label: 'MHz' };
+            if (hz >= 1e3) return { val: hz / 1e3, unit: '1e3', label: 'kHz' };
+            return                { val: hz,        unit: '1',   label: 'Hz'  };
+        }
+
+        function setSelectByValue(selectEl, value) {
+            for (let opt of selectEl.options) {
+                if (opt.value === value) { opt.selected = true; return; }
+            }
+        }
+
+        function clearResult(prefix) {
+            ['r','c','f'].forEach(k => {
+                const el = document.getElementById(`${prefix}-${k}`);
+                el.classList.remove('result', 'error');
+            });
+            ['r-err','c-err','f-err'].forEach(k => {
+                document.getElementById(`${prefix}-${k}`).textContent = '';
+            });
+            document.getElementById(`${prefix}-msg`).textContent = '';
+        }
+
+        function calculate(prefix) {
+            clearResult(prefix);
+            const msg = document.getElementById(`${prefix}-msg`);
+
+            const rVal = getVal(`${prefix}-r`, `${prefix}-r-unit`);
+            const cVal = getVal(`${prefix}-c`, `${prefix}-c-unit`);
+            const fVal = getVal(`${prefix}-f`, `${prefix}-f-unit`);
+
+            // Validate any filled-in fields
+            if (rVal === 'invalid') {
+                document.getElementById(`${prefix}-r-err`).textContent = 'Enter a positive number.';
+                document.getElementById(`${prefix}-r`).classList.add('error');
+                return;
+            }
+            if (cVal === 'invalid') {
+                document.getElementById(`${prefix}-c-err`).textContent = 'Enter a positive number.';
+                document.getElementById(`${prefix}-c`).classList.add('error');
+                return;
+            }
+            if (fVal === 'invalid') {
+                document.getElementById(`${prefix}-f-err`).textContent = 'Enter a positive number.';
+                document.getElementById(`${prefix}-f`).classList.add('error');
+                return;
+            }
+
+            const empty = [rVal === null, cVal === null, fVal === null];
+            const emptyCount = empty.filter(Boolean).length;
+
+            if (emptyCount === 0) {
+                msg.textContent = 'All fields are filled — clear one field to solve for it.';
+                return;
+            }
+            if (emptyCount > 1) {
+                msg.textContent = 'Fill in two fields to calculate the third.';
+                return;
+            }
+
+            const TWO_PI = 2 * Math.PI;
+
+            if (rVal === null) {
+                // R = 1 / (2π · f · C)
+                const R = 1 / (TWO_PI * fVal * cVal);
+                const best = bestResUnit(R);
+                const rInput = document.getElementById(`${prefix}-r`);
+                rInput.value = parseFloat(best.val.toPrecision(6));
+                rInput.classList.add('result');
+                setSelectByValue(document.getElementById(`${prefix}-r-unit`), best.unit);
+            } else if (cVal === null) {
+                // C = 1 / (2π · f · R)
+                const C = 1 / (TWO_PI * fVal * rVal);
+                const best = bestCapUnit(C);
+                const cInput = document.getElementById(`${prefix}-c`);
+                cInput.value = parseFloat(best.val.toPrecision(6));
+                cInput.classList.add('result');
+                setSelectByValue(document.getElementById(`${prefix}-c-unit`), best.unit);
+            } else {
+                // f = 1 / (2π · R · C)
+                const F = 1 / (TWO_PI * rVal * cVal);
+                const best = bestFreqUnit(F);
+                const fInput = document.getElementById(`${prefix}-f`);
+                fInput.value = parseFloat(best.val.toPrecision(6));
+                fInput.classList.add('result');
+                setSelectByValue(document.getElementById(`${prefix}-f-unit`), best.unit);
+            }
+        }
+
+        function resetSection(prefix) {
+            ['r','c','f'].forEach(k => {
+                const input = document.getElementById(`${prefix}-${k}`);
+                input.value = '';
+                input.classList.remove('result', 'error');
+            });
+            // Reset unit dropdowns to defaults
+            setSelectByValue(document.getElementById(`${prefix}-r-unit`), '1e3');
+            setSelectByValue(document.getElementById(`${prefix}-c-unit`), '1e-9');
+            setSelectByValue(document.getElementById(`${prefix}-f-unit`), '1');
+            ['r-err','c-err','f-err'].forEach(k => {
+                document.getElementById(`${prefix}-${k}`).textContent = '';
+            });
+            document.getElementById(`${prefix}-msg`).textContent = '';
+        }
+
+        // Allow pressing Enter in any input to trigger calculate
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
+                    calculate(prefix);
+                }
+            });
+            // Clear result highlight when user edits a solved field
+            input.addEventListener('input', () => {
+                input.classList.remove('result', 'error');
+                const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
+                document.getElementById(`${prefix}-msg`).textContent = '';
+            });
+        });
+    </script>
+</body>
+</html>
