@@ -314,6 +314,10 @@
                             <span>Detected path (deep)</span>
                         </div>
                         <div class="legend-item">
+                            <div class="legend-swatch" style="background:white;border-top:3px dashed white;height:0;margin-top:5px;"></div>
+                            <span>Mean path (avg x per depth)</span>
+                        </div>
+                        <div class="legend-item">
                             <div class="legend-swatch" style="background:#27ae60;width:10px;height:10px;border-radius:50%;"></div>
                             <span>Source / Detector</span>
                         </div>
@@ -506,6 +510,60 @@
             }
             ctx.stroke();
         });
+
+        // ── Average path (Option A): mean x per depth-slice bin ──────────────
+        if (nPaths > 0) {
+            const N_BINS = 200;
+            const xSum  = new Float64Array(N_BINS);
+            const xCount = new Int32Array(N_BINS);
+
+            detectedPaths.forEach(path => {
+                path.forEach(([px, pz]) => {
+                    if (pz <= 0 || pz >= zMax) return;
+                    const bin = Math.floor(pz / zMax * N_BINS);
+                    if (bin >= 0 && bin < N_BINS) {
+                        xSum[bin]  += px;
+                        xCount[bin]++;
+                    }
+                });
+            });
+
+            // Collect bins that have data, smooth with a simple 5-bin moving average
+            const pts = [];
+            for (let b = 0; b < N_BINS; b++) {
+                if (xCount[b] > 0) {
+                    pts.push([xSum[b] / xCount[b], (b + 0.5) / N_BINS * zMax]);
+                }
+            }
+
+            // 5-point moving average over x to smooth
+            const smoothed = pts.map(([,z], i) => {
+                let sumX = 0, cnt = 0;
+                for (let j = Math.max(0, i-2); j <= Math.min(pts.length-1, i+2); j++) {
+                    sumX += pts[j][0]; cnt++;
+                }
+                return [sumX / cnt, z];
+            });
+
+            if (smoothed.length > 1) {
+                ctx.save();
+                ctx.setLineDash([10, 6]);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                // Start at source (0,0)
+                ctx.moveTo(toCanvasX(0), toCanvasZ(0));
+                smoothed.forEach(([ax, az]) => {
+                    ctx.lineTo(toCanvasX(ax), toCanvasZ(az));
+                });
+                // End at detector (sdd, 0)
+                ctx.lineTo(toCanvasX(sdd), toCanvasZ(0));
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
 
         // Source dot
         ctx.fillStyle = '#27ae60';
