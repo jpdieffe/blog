@@ -387,6 +387,77 @@ footer {
     margin-top: 4rem;
 }
 
+/* Tools & Sims Page */
+.page-header {
+    margin-bottom: 2.5rem;
+}
+
+.page-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.tool-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.tool-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.75rem;
+}
+
+.tool-category {
+    display: inline-block;
+    background-color: #eef0fd;
+    color: #667eea;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    align-self: flex-start;
+}
+
+.tool-card h3 {
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+}
+
+.tool-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.tool-btn {
+    align-self: flex-start;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-container {
