@@ -511,46 +511,56 @@
             ctx.stroke();
         });
 
-        // ── Average path (Option A): mean x per depth-slice bin ──────────────
+        // ── Average path: for each x column, find the z (depth) with most photons ──
         if (nPaths > 0) {
-            const N_BINS = 40;
-            const xSum   = new Float64Array(N_BINS);
-            const xCount = new Int32Array(N_BINS);
+            const X_BINS = 80;   // columns between source and detector
+            const Z_BINS = 80;   // depth rows
+
+            // 2D histogram: [xBin][zBin]
+            const hist = Array.from({ length: X_BINS }, () => new Int32Array(Z_BINS));
 
             detectedPaths.forEach(path => {
                 path.forEach(([px, pz]) => {
                     if (pz <= 0 || pz >= zMax) return;
-                    const bin = Math.floor(pz / zMax * N_BINS);
-                    if (bin >= 0 && bin < N_BINS) {
-                        xSum[bin]  += px;
-                        xCount[bin]++;
-                    }
+                    if (px < 0 || px > sdd) return;
+                    const xb = Math.min(X_BINS - 1, Math.floor(px / sdd * X_BINS));
+                    const zb = Math.min(Z_BINS - 1, Math.floor(pz / zMax * Z_BINS));
+                    hist[xb][zb]++;
                 });
             });
 
-            // Only keep bins with sufficient samples (at least 1% of detected photons)
-            const minCount = Math.max(3, nPaths * 0.01);
-            const rawPts = [];
-            for (let b = 0; b < N_BINS; b++) {
-                if (xCount[b] >= minCount) {
-                    rawPts.push([xSum[b] / xCount[b], (b + 0.5) / N_BINS * zMax]);
+            // For each x column, find the z bin with the highest count (mode)
+            const ridgePts = [];
+            for (let xb = 0; xb < X_BINS; xb++) {
+                let maxCount = 0, bestZb = -1;
+                for (let zb = 0; zb < Z_BINS; zb++) {
+                    if (hist[xb][zb] > maxCount) {
+                        maxCount = hist[xb][zb];
+                        bestZb = zb;
+                    }
+                }
+                const minCount = Math.max(2, nPaths * 0.005);
+                if (bestZb >= 0 && maxCount >= minCount) {
+                    const cx = (xb + 0.5) / X_BINS * sdd;
+                    const cz = (bestZb + 0.5) / Z_BINS * zMax;
+                    ridgePts.push([cx, cz]);
                 }
             }
 
-            // 11-point moving average for smooth banana curve
-            const smoothed = rawPts.map(([, z], i) => {
-                let sumX = 0, cnt = 0;
-                for (let j = Math.max(0, i - 5); j <= Math.min(rawPts.length - 1, i + 5); j++) {
-                    sumX += rawPts[j][0]; cnt++;
+            // Light smoothing: 5-point moving average
+            const smoothed = ridgePts.map(([, z], i) => {
+                let sumX = 0, sumZ = 0, cnt = 0;
+                for (let j = Math.max(0, i - 2); j <= Math.min(ridgePts.length - 1, i + 2); j++) {
+                    sumX += ridgePts[j][0]; sumZ += ridgePts[j][1]; cnt++;
                 }
-                return [sumX / cnt, z];
+                return [sumX / cnt, sumZ / cnt];
             });
 
             if (smoothed.length > 1) {
                 ctx.save();
                 ctx.setLineDash([12, 7]);
                 ctx.lineWidth = 3;
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
                 ctx.lineJoin = 'round';
                 ctx.lineCap = 'round';
                 ctx.beginPath();
