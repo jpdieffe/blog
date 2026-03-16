@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hex ↔ Binary Converter - My Professional Blog</title>
+    <title>Binary / Decimal / Hex Converter - My Professional Blog</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .converter-wrap {
@@ -164,28 +164,10 @@
         <div class="converter-wrap">
             <a href="tools-sims.html" class="back-link">← Back to Tools &amp; Sims</a>
 
-            <h1>Hex ↔ Binary Converter</h1>
+            <h1>Binary / Decimal / Hex Converter</h1>
 
             <div class="converter-box">
-                <p class="instructions">Type in either field and the conversion updates live. Binary groups are spaced by 4 bits for readability.</p>
-
-                <div class="field-group">
-                    <label for="hex-input">Hexadecimal <span>0–9, A–F</span></label>
-                    <div class="field-row">
-                        <input
-                            id="hex-input"
-                            class="converter-input"
-                            type="text"
-                            placeholder="e.g. 1A3F"
-                            autocomplete="off"
-                            spellcheck="false"
-                        >
-                        <button class="copy-btn" data-target="hex-input">Copy</button>
-                    </div>
-                    <div class="error-msg" id="hex-error"></div>
-                </div>
-
-                <hr class="divider-line">
+                <p class="instructions">Type in any field and the others update live. Binary is grouped in 4-bit nibbles for readability.</p>
 
                 <div class="field-group">
                     <label for="bin-input">Binary <span>0s and 1s</span></label>
@@ -203,6 +185,42 @@
                     <div class="error-msg" id="bin-error"></div>
                 </div>
 
+                <hr class="divider-line">
+
+                <div class="field-group">
+                    <label for="dec-input">Decimal <span>base 10</span></label>
+                    <div class="field-row">
+                        <input
+                            id="dec-input"
+                            class="converter-input"
+                            type="text"
+                            placeholder="e.g. 6719"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button class="copy-btn" data-target="dec-input">Copy</button>
+                    </div>
+                    <div class="error-msg" id="dec-error"></div>
+                </div>
+
+                <hr class="divider-line">
+
+                <div class="field-group">
+                    <label for="hex-input">Hexadecimal <span>0–9, A–F</span></label>
+                    <div class="field-row">
+                        <input
+                            id="hex-input"
+                            class="converter-input"
+                            type="text"
+                            placeholder="e.g. 1A3F"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button class="copy-btn" data-target="hex-input">Copy</button>
+                    </div>
+                    <div class="error-msg" id="hex-error"></div>
+                </div>
+
                 <div class="clear-row">
                     <button class="clear-btn" id="clear-btn">Clear</button>
                 </div>
@@ -217,90 +235,92 @@
     <script>
         const hexInput = document.getElementById('hex-input');
         const binInput = document.getElementById('bin-input');
+        const decInput = document.getElementById('dec-input');
         const hexError = document.getElementById('hex-error');
         const binError = document.getElementById('bin-error');
+        const decError = document.getElementById('dec-error');
 
-        // Format binary string into groups of 4, separated by spaces
         function formatBinary(bin) {
             const clean = bin.replace(/\s/g, '');
-            // Pad left so length is a multiple of 4
+            if (!clean) return '';
             const padded = clean.padStart(Math.ceil(clean.length / 4) * 4, '0');
             return padded.match(/.{1,4}/g).join(' ');
         }
 
-        function hexToBin(hex) {
-            const map = {
-                '0':'0000','1':'0001','2':'0010','3':'0011',
-                '4':'0100','5':'0101','6':'0110','7':'0111',
-                '8':'1000','9':'1001','A':'1010','B':'1011',
-                'C':'1100','D':'1101','E':'1110','F':'1111'
-            };
-            return hex.toUpperCase().split('').map(c => map[c]).join('');
-        }
-
-        function binToHex(bin) {
-            const clean = bin.replace(/\s/g, '');
-            // Pad to multiple of 4
-            const padded = clean.padStart(Math.ceil(clean.length / 4) * 4, '0');
-            const groups = padded.match(/.{1,4}/g);
-            return groups.map(g => parseInt(g, 2).toString(16).toUpperCase()).join('');
-        }
-
-        hexInput.addEventListener('input', () => {
-            const raw = hexInput.value.replace(/\s/g, '');
+        function clearErrors() {
+            [hexInput, binInput, decInput].forEach(el => el.classList.remove('error'));
             hexError.textContent = '';
-            hexInput.classList.remove('error');
-
-            if (raw === '') {
-                binInput.value = '';
-                binError.textContent = '';
-                return;
-            }
-
-            if (!/^[0-9a-fA-F]+$/.test(raw)) {
-                hexInput.classList.add('error');
-                hexError.textContent = 'Invalid hex — use 0–9 and A–F only.';
-                binInput.value = '';
-                return;
-            }
-
-            const bin = hexToBin(raw);
-            binInput.value = formatBinary(bin);
             binError.textContent = '';
-            binInput.classList.remove('error');
-        });
+            decError.textContent = '';
+        }
+
+        // From binary string (clean, no spaces) → update hex and decimal
+        function updateFromBin(clean) {
+            // Use BigInt to support arbitrarily large values
+            const val = BigInt('0b' + clean);
+            hexInput.value = val.toString(16).toUpperCase();
+            decInput.value = val.toString(10);
+        }
+
+        // From hex string → update binary and decimal
+        function updateFromHex(clean) {
+            const val = BigInt('0x' + clean);
+            binInput.value = formatBinary(val.toString(2));
+            decInput.value = val.toString(10);
+        }
+
+        // From decimal string → update binary and hex
+        function updateFromDec(clean) {
+            const val = BigInt(clean);
+            binInput.value = formatBinary(val.toString(2));
+            hexInput.value = val.toString(16).toUpperCase();
+        }
 
         binInput.addEventListener('input', () => {
             const raw = binInput.value.replace(/\s/g, '');
-            binError.textContent = '';
-            binInput.classList.remove('error');
-
-            if (raw === '') {
-                hexInput.value = '';
-                hexError.textContent = '';
-                return;
-            }
-
+            clearErrors();
+            if (raw === '') { hexInput.value = ''; decInput.value = ''; return; }
             if (!/^[01]+$/.test(raw)) {
                 binInput.classList.add('error');
                 binError.textContent = 'Invalid binary — use 0s and 1s only.';
-                hexInput.value = '';
+                hexInput.value = ''; decInput.value = '';
                 return;
             }
+            try { updateFromBin(raw); } catch(e) { binInput.classList.add('error'); binError.textContent = 'Conversion error.'; }
+        });
 
-            hexInput.value = binToHex(raw);
-            hexError.textContent = '';
-            hexInput.classList.remove('error');
+        decInput.addEventListener('input', () => {
+            const raw = decInput.value.trim();
+            clearErrors();
+            if (raw === '') { hexInput.value = ''; binInput.value = ''; return; }
+            if (!/^\d+$/.test(raw)) {
+                decInput.classList.add('error');
+                decError.textContent = 'Invalid decimal — digits only.';
+                hexInput.value = ''; binInput.value = '';
+                return;
+            }
+            try { updateFromDec(raw); } catch(e) { decInput.classList.add('error'); decError.textContent = 'Conversion error.'; }
+        });
+
+        hexInput.addEventListener('input', () => {
+            const raw = hexInput.value.replace(/\s/g, '');
+            clearErrors();
+            if (raw === '') { binInput.value = ''; decInput.value = ''; return; }
+            if (!/^[0-9a-fA-F]+$/.test(raw)) {
+                hexInput.classList.add('error');
+                hexError.textContent = 'Invalid hex — use 0–9 and A–F only.';
+                binInput.value = ''; decInput.value = '';
+                return;
+            }
+            try { updateFromHex(raw); } catch(e) { hexInput.classList.add('error'); hexError.textContent = 'Conversion error.'; }
         });
 
         document.getElementById('clear-btn').addEventListener('click', () => {
             hexInput.value = '';
             binInput.value = '';
-            hexError.textContent = '';
-            binError.textContent = '';
-            hexInput.classList.remove('error');
-            binInput.classList.remove('error');
-            hexInput.focus();
+            decInput.value = '';
+            clearErrors();
+            binInput.focus();
         });
 
         document.querySelectorAll('.copy-btn').forEach(btn => {
