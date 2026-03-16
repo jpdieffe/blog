@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RC Filter Calculator - My Professional Blog</title>
+    <title>RC / Sallen-Key Filter Calculator - My Professional Blog</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .tool-wrap {
@@ -160,6 +160,12 @@
             border-top: 2px solid #e9ecef;
             margin: 2.5rem 0;
         }
+
+        .fields-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -299,7 +305,170 @@
                 <div class="calc-msg" id="hpf-msg"></div>
 
                 <div class="formula-note">
-                    f<sub>c</sub> = 1 / (2π · R · C)
+                    f<sub>c</sub> = 1 / (2&pi; &middot; R &middot; C)
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- ===== 2ND ORDER SALLEN-KEY HPF ===== -->
+            <div class="filter-box" id="sk2-box">
+                <h2>2nd-Order Sallen-Key High-Pass Filter</h2>
+                <p class="subtitle">Fill in any four fields and hit Calculate to solve for the fifth.</p>
+
+                <!-- SVG Schematic -->
+                <svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:100%;height:auto;margin:0 auto 1.75rem;border:1px solid #e9ecef;border-radius:6px;background:#fafafa;padding:4px;">
+
+                  <!-- Vin label and lead wire -->
+                  <text x="5" y="119" font-family="sans-serif" font-size="13" fill="#2c3e50">Vin</text>
+                  <line x1="40" y1="115" x2="85" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- C1 (two vertical plates) -->
+                  <line x1="85" y1="98" x2="85" y2="132" stroke="#2c3e50" stroke-width="2.2"/>
+                  <line x1="97" y1="98" x2="97" y2="132" stroke="#2c3e50" stroke-width="2.2"/>
+                  <text x="91" y="89" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea" text-anchor="middle">C1</text>
+
+                  <!-- Wire C1 to NodeA -->
+                  <line x1="97" y1="115" x2="155" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <circle cx="155" cy="115" r="4" fill="#2c3e50"/>
+
+                  <!-- C2 (two vertical plates) -->
+                  <line x1="155" y1="115" x2="192" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="192" y1="98" x2="192" y2="132" stroke="#2c3e50" stroke-width="2.2"/>
+                  <line x1="204" y1="98" x2="204" y2="132" stroke="#2c3e50" stroke-width="2.2"/>
+                  <text x="198" y="89" font-family="sans-serif" font-size="12" font-weight="bold" fill="#667eea" text-anchor="middle">C2</text>
+
+                  <!-- Wire C2 to NodeB -->
+                  <line x1="204" y1="115" x2="268" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+                  <circle cx="268" cy="115" r="4" fill="#2c3e50"/>
+
+                  <!-- Wire NodeB to V+ of op-amp -->
+                  <line x1="268" y1="115" x2="308" y2="115" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- Op-amp triangle: (308,78)-(308,178)-(382,128) -->
+                  <!-- V+ at y=115 (37% from top), V- at y=143 (65% from top), apex at (382,128) -->
+                  <polygon points="308,78 308,178 382,128" fill="white" stroke="#2c3e50" stroke-width="2"/>
+                  <text x="316" y="120" font-family="sans-serif" font-size="14" fill="#2c3e50">+</text>
+                  <text x="314" y="151" font-family="sans-serif" font-size="16" fill="#2c3e50">&#x2212;</text>
+
+                  <!-- Output wire from apex -->
+                  <line x1="382" y1="128" x2="510" y2="128" stroke="#2c3e50" stroke-width="1.8"/>
+                  <!-- Junction dot: where R2 meets output wire -->
+                  <circle cx="460" cy="128" r="4" fill="#2c3e50"/>
+                  <!-- Junction dot: where feedback leaves output wire -->
+                  <circle cx="490" cy="128" r="4" fill="#2c3e50"/>
+                  <!-- Vout label -->
+                  <text x="513" y="132" font-family="sans-serif" font-size="13" fill="#2c3e50">Vout</text>
+
+                  <!-- R1: NodeB (268,115) down to GND -->
+                  <line x1="268" y1="119" x2="268" y2="140" stroke="#2c3e50" stroke-width="1.8"/>
+                  <rect x="258" y="140" width="20" height="46" fill="white" stroke="#2c3e50" stroke-width="1.8"/>
+                  <text x="268" y="169" font-family="sans-serif" font-size="11" font-weight="bold" fill="#667eea" text-anchor="middle">R1</text>
+                  <line x1="268" y1="186" x2="268" y2="220" stroke="#2c3e50" stroke-width="1.8"/>
+                  <!-- GND symbol -->
+                  <line x1="252" y1="220" x2="284" y2="220" stroke="#2c3e50" stroke-width="2"/>
+                  <line x1="257" y1="228" x2="279" y2="228" stroke="#2c3e50" stroke-width="2"/>
+                  <line x1="262" y1="236" x2="274" y2="236" stroke="#2c3e50" stroke-width="2"/>
+
+                  <!-- R2: NodeA up and over to output junction -->
+                  <line x1="155" y1="111" x2="155" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="155" y1="38" x2="225" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <rect x="225" y="26" width="80" height="24" fill="white" stroke="#2c3e50" stroke-width="1.8"/>
+                  <text x="265" y="43" font-family="sans-serif" font-size="11" font-weight="bold" fill="#667eea" text-anchor="middle">R2</text>
+                  <line x1="305" y1="38" x2="460" y2="38" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="460" y1="38" x2="460" y2="124" stroke="#2c3e50" stroke-width="1.8"/>
+
+                  <!-- Unity-gain feedback: Vout to V- (routes below then back left) -->
+                  <line x1="490" y1="132" x2="490" y2="252" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="490" y1="252" x2="300" y2="252" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="300" y1="252" x2="300" y2="143" stroke="#2c3e50" stroke-width="1.8"/>
+                  <line x1="300" y1="143" x2="308" y2="143" stroke="#2c3e50" stroke-width="1.8"/>
+
+                </svg>
+
+                <!-- R1 and R2 side by side -->
+                <div class="fields-row">
+                    <div class="filter-field">
+                        <label for="sk2-r1">R1</label>
+                        <div class="input-unit-row">
+                            <input id="sk2-r1" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                            <select id="sk2-r1-unit" class="unit-select">
+                                <option value="1">&Omega;</option>
+                                <option value="1e3" selected>k&Omega;</option>
+                                <option value="1e6">M&Omega;</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sk2-r1-err"></div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="sk2-r2">R2</label>
+                        <div class="input-unit-row">
+                            <input id="sk2-r2" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 10">
+                            <select id="sk2-r2-unit" class="unit-select">
+                                <option value="1">&Omega;</option>
+                                <option value="1e3" selected>k&Omega;</option>
+                                <option value="1e6">M&Omega;</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sk2-r2-err"></div>
+                    </div>
+                </div>
+
+                <!-- C1 and C2 side by side -->
+                <div class="fields-row">
+                    <div class="filter-field">
+                        <label for="sk2-c1">C1</label>
+                        <div class="input-unit-row">
+                            <input id="sk2-c1" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                            <select id="sk2-c1-unit" class="unit-select">
+                                <option value="1">F</option>
+                                <option value="1e-3">mF</option>
+                                <option value="1e-6">&micro;F</option>
+                                <option value="1e-9" selected>nF</option>
+                                <option value="1e-12">pF</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sk2-c1-err"></div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="sk2-c2">C2</label>
+                        <div class="input-unit-row">
+                            <input id="sk2-c2" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 100">
+                            <select id="sk2-c2-unit" class="unit-select">
+                                <option value="1">F</option>
+                                <option value="1e-3">mF</option>
+                                <option value="1e-6">&micro;F</option>
+                                <option value="1e-9" selected>nF</option>
+                                <option value="1e-12">pF</option>
+                            </select>
+                        </div>
+                        <div class="error-msg" id="sk2-c2-err"></div>
+                    </div>
+                </div>
+
+                <!-- Cutoff frequency full width -->
+                <div class="filter-field">
+                    <label for="sk2-f">Cutoff Frequency</label>
+                    <div class="input-unit-row">
+                        <input id="sk2-f" class="filter-input" type="number" min="0" step="any" placeholder="e.g. 1.59">
+                        <select id="sk2-f-unit" class="unit-select">
+                            <option value="1" selected>Hz</option>
+                            <option value="1e3">kHz</option>
+                            <option value="1e6">MHz</option>
+                            <option value="1e9">GHz</option>
+                        </select>
+                    </div>
+                    <div class="error-msg" id="sk2-f-err"></div>
+                </div>
+
+                <div class="calc-row">
+                    <button class="calc-btn" onclick="calculateSK()">Calculate</button>
+                    <button class="reset-btn" onclick="resetSK()">Reset</button>
+                </div>
+                <div class="calc-msg" id="sk2-msg"></div>
+
+                <div class="formula-note">
+                    f<sub>c</sub> = 1 / (2&pi; &middot; &radic;(R1 &middot; R2 &middot; C1 &middot; C2))
                 </div>
             </div>
 
@@ -444,17 +613,93 @@
             document.getElementById(`${prefix}-msg`).textContent = '';
         }
 
+        function clearResultSK() {
+            ['r1','r2','c1','c2','f'].forEach(k => {
+                document.getElementById(`sk2-${k}`).classList.remove('result', 'error');
+                document.getElementById(`sk2-${k}-err`).textContent = '';
+            });
+            document.getElementById('sk2-msg').textContent = '';
+        }
+
+        function calculateSK() {
+            clearResultSK();
+            const msg = document.getElementById('sk2-msg');
+            const TWO_PI = 2 * Math.PI;
+
+            const r1Val = getVal('sk2-r1', 'sk2-r1-unit');
+            const r2Val = getVal('sk2-r2', 'sk2-r2-unit');
+            const c1Val = getVal('sk2-c1', 'sk2-c1-unit');
+            const c2Val = getVal('sk2-c2', 'sk2-c2-unit');
+            const fVal  = getVal('sk2-f',  'sk2-f-unit');
+            const vals  = { r1: r1Val, r2: r2Val, c1: c1Val, c2: c2Val, f: fVal };
+
+            for (const [key, v] of Object.entries(vals)) {
+                if (v === 'invalid') {
+                    document.getElementById(`sk2-${key}-err`).textContent = 'Enter a positive number.';
+                    document.getElementById(`sk2-${key}`).classList.add('error');
+                    return;
+                }
+            }
+
+            const emptyKeys = Object.entries(vals).filter(([,v]) => v === null).map(([k]) => k);
+            if (emptyKeys.length === 0) { msg.textContent = 'All fields are filled — clear one to solve for it.'; return; }
+            if (emptyKeys.length > 1)  { msg.textContent = 'Fill in four fields to calculate the fifth.'; return; }
+
+            const empty = emptyKeys[0];
+            const { r1, r2, c1, c2, f } = { r1: r1Val, r2: r2Val, c1: c1Val, c2: c2Val, f: fVal };
+            let result, best;
+
+            if (empty === 'f') {
+                result = 1 / (TWO_PI * Math.sqrt(r1 * r2 * c1 * c2));
+                best = bestFreqUnit(result);
+            } else if (empty === 'r1') {
+                result = 1 / (Math.pow(TWO_PI * f, 2) * r2 * c1 * c2);
+                best = bestResUnit(result);
+            } else if (empty === 'r2') {
+                result = 1 / (Math.pow(TWO_PI * f, 2) * r1 * c1 * c2);
+                best = bestResUnit(result);
+            } else if (empty === 'c1') {
+                result = 1 / (Math.pow(TWO_PI * f, 2) * r1 * r2 * c2);
+                best = bestCapUnit(result);
+            } else {
+                result = 1 / (Math.pow(TWO_PI * f, 2) * r1 * r2 * c1);
+                best = bestCapUnit(result);
+            }
+
+            const inputEl = document.getElementById(`sk2-${empty}`);
+            const unitEl  = document.getElementById(`sk2-${empty}-unit`);
+            inputEl.value = parseFloat(best.val.toPrecision(6));
+            inputEl.classList.add('result');
+            setSelectByValue(unitEl, best.unit);
+        }
+
+        function resetSK() {
+            ['r1','r2','c1','c2','f'].forEach(k => {
+                const el = document.getElementById(`sk2-${k}`);
+                el.value = '';
+                el.classList.remove('result', 'error');
+                document.getElementById(`sk2-${k}-err`).textContent = '';
+            });
+            setSelectByValue(document.getElementById('sk2-r1-unit'), '1e3');
+            setSelectByValue(document.getElementById('sk2-r2-unit'), '1e3');
+            setSelectByValue(document.getElementById('sk2-c1-unit'), '1e-9');
+            setSelectByValue(document.getElementById('sk2-c2-unit'), '1e-9');
+            setSelectByValue(document.getElementById('sk2-f-unit'),  '1');
+            document.getElementById('sk2-msg').textContent = '';
+        }
+
         // Allow pressing Enter in any input to trigger calculate
         document.querySelectorAll('.filter-input').forEach(input => {
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') {
+                    if (input.id.startsWith('sk2')) { calculateSK(); return; }
                     const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
                     calculate(prefix);
                 }
             });
-            // Clear result highlight when user edits a solved field
             input.addEventListener('input', () => {
                 input.classList.remove('result', 'error');
+                if (input.id.startsWith('sk2')) { document.getElementById('sk2-msg').textContent = ''; return; }
                 const prefix = input.id.startsWith('lpf') ? 'lpf' : 'hpf';
                 document.getElementById(`${prefix}-msg`).textContent = '';
             });
