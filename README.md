@@ -2,12 +2,12 @@
 
 **Live site: https://jpdieffe.github.io/blog/**
 
-A clean, professional blog website hosted on GitHub Pages featuring sections for blog posts, publications, funded proposals, and engineering consulting services.
+A clean, professional blog website hosted on GitHub Pages featuring blog posts, publications, funded proposals, engineering consulting services, interactive tools, and multiplayer games.
 
 ## Features
 
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Clean Navigation**: Easy-to-use navigation menu with 4 main sections
+- **Clean Navigation**: Easy-to-use navigation menu with 6 main sections
 - **Professional Styling**: Modern, professional appearance suitable for academic and engineering professionals
 - **GitHub Pages Ready**: Pre-configured for deployment on GitHub Pages
 
@@ -17,6 +17,8 @@ A clean, professional blog website hosted on GitHub Pages featuring sections for
 2. **Publications**: Showcase research publications and papers
 3. **Funded Proposals**: Highlight successfully funded research projects
 4. **Engineering Consulting**: Display consulting services and expertise
+5. **Tools & Simulations**: Interactive engineering tools and simulations
+6. **Games**: Online multiplayer games hosted on GitHub Pages, with screenshot thumbnails and links to play or browse the source
 
 ## Getting Started
 
@@ -46,6 +48,8 @@ A clean, professional blog website hosted on GitHub Pages featuring sections for
 3. **Publications** (`publications.html`): Add your research publications
 4. **Funded Proposals** (`funded-proposals.html`): List your funded projects
 5. **Consulting** (`consulting.html`): Update services and contact information
+6. **Tools & Simulations** (`tools-sims.html`): Update the interactive tools directory
+7. **Games** (`games.html`): Add or edit game entries, linking to each live GitHub Pages site and repository. Store screenshot thumbnails in `assets/games/` as 320 × 210 WebP images; use an actual gameplay or landing-page capture.
 
 #### Customize Styling
 

@@ -29,6 +29,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .logo a {
@@ -41,10 +43,12 @@ body {
 .nav-menu {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .nav-menu a {
+    display: block;
     color: white;
     text-decoration: none;
     font-weight: 500;
@@ -431,6 +435,105 @@ footer {
 
 .tool-btn {
     display: inline-block;
+}
+
+/* Games */
+.games-list {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 0 1.5rem;
+}
+
+.game-entry {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+}
+
+.game-entry + .game-entry {
+    border-top: 1px solid #e9ecef;
+}
+
+.game-thumbnail {
+    display: block;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #e9ecef;
+}
+
+.game-thumbnail img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.game-details h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.35rem;
+}
+
+.game-details h2 a {
+    color: #2c3e50;
+    text-decoration: none;
+}
+
+.game-details h2 a:hover {
+    text-decoration: underline;
+}
+
+.game-details p {
+    color: #666;
+}
+
+.game-details .game-genre {
+    color: #5568b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.game-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.game-source {
+    color: #4659b0;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.game-source:hover {
+    text-decoration: underline;
+}
+
+.game-entry a:focus-visible {
+    outline: 3px solid #4659b0;
+    outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+    .games-list {
+        padding: 0 1rem;
+    }
+
+    .game-entry {
+        grid-template-columns: 96px minmax(0, 1fr);
+        align-items: start;
+        gap: 1rem;
+    }
+
+    .game-links {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
 }
 
 /* Responsive Design */
